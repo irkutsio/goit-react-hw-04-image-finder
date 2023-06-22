@@ -1,4 +1,4 @@
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Searchbar } from './Searchbar/Searchbar';
 import { fetchImages } from 'services/imageSearch';
@@ -15,38 +15,8 @@ export const App = () => {
   const [isShowBtn, setIsShowBtn] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (!query || !page) {
-      return;
-    }
 
-    getImages(query, page);
-  }, [query, page]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      window.scrollBy({
-        top: 1150,
-        behavior: 'smooth',
-      });
-    }, 1000);
-  }, [images.length]);
-
-
-
-  const handleLoadingMore = () => {
-    setPage((prev)=>prev + 1)
-  }
-
-  const handleSubmit = value => {
-    setQuery(value);
-    setPage(1);
-    setImages([]);
-    setIsEmpty(false);
-    setIsShowBtn(false);
-  };
-
- const getImages = async (query, page) => {
+  const getImages = async (query, page) => {
     setIsLoading(true);
     try {
       const imageObj = await fetchImages(query, page);
@@ -64,6 +34,40 @@ export const App = () => {
     }
   };
 
+
+  useEffect(() => {
+    if (!query || !page) {
+      return;
+    }
+    getImages(query, page);
+  }, [query, page]);
+
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollBy({
+        top: 1150,
+        behavior: 'smooth',
+      });
+    }, 1000);
+  }, [images.length]);
+
+
+  const handleSubmit = value => {
+    setQuery(value);
+    setPage(1);
+    setImages([]);
+    setIsEmpty(false);
+    setIsShowBtn(false);
+  };
+
+
+  
+  const handleLoadingMore = () => {
+    setPage(prev => prev + 1);
+  };
+
+
   return (
     <div>
       <Searchbar onSubmit={handleSubmit} />
@@ -75,4 +79,3 @@ export const App = () => {
     </div>
   );
 };
-
