@@ -62,13 +62,11 @@ export const App = () => {
   };
 
 
-  
   const handleLoadingMore = () => {
     setPage(prev => prev + 1);
   };
 
-
-  return (
+return (
     <div>
       <Searchbar onSubmit={handleSubmit} />
       {isLoading && <Spinner />}
