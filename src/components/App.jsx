@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import {  useEffect, useState } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Searchbar } from './Searchbar/Searchbar';
 import { fetchImages } from 'services/imageSearch';
@@ -6,80 +6,73 @@ import { Spinner } from './Loader/Loader';
 import { Button } from './Button/Button';
 import { Warning } from './Warnings/Warning.styled';
 
-export class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    images: [],
-    isLoading: false,
-    isEmpty: false,
-    isShowBtn: false,
-    error: null,
-  };
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEmpty, setIsEmpty] = useState(false);
+  const [isShowBtn, setIsShowBtn] = useState(false);
+  const [error, setError] = useState(null);
 
-  componentDidUpdate(_, prevState) {
-    const { query, page, images } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
-      this.getImages(query, page);
+  useEffect(() => {
+    if (!query || !page) {
+      return;
     }
-    if (prevState.images.length !== images.length) {
-      setTimeout(() => {
-        window.scrollBy({
-          top: 1150,
-          behavior: 'smooth',
-        });
-      }, 1000);
-    }
+
+    getImages(query, page);
+  }, [query, page]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollBy({
+        top: 1150,
+        behavior: 'smooth',
+      });
+    }, 1000);
+  }, [images.length]);
+
+
+
+  const handleLoadingMore = () => {
+    setPage((prev)=>prev + 1)
   }
 
-  handleSubmit = value => {
-    this.setState({
-      query: value,
-      page: 1,
-      images: [],
-      isEmpty: false,
-      isShowBtn: false,
-    });
+  const handleSubmit = value => {
+    setQuery(value);
+    setPage(1);
+    setImages([]);
+    setIsEmpty(false);
+    setIsShowBtn(false);
   };
 
-  handleLoadingMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
-  };
-
-  getImages = async (query, page) => {
-    this.setState({ isLoading: true });
+ const getImages = async (query, page) => {
+    setIsLoading(true);
     try {
       const imageObj = await fetchImages(query, page);
 
       if (!imageObj.hits.length) {
-        this.setState({
-          isEmpty: true,
-        });
+        setIsEmpty(true);
         return;
       }
-
-      this.setState(prevState => ({
-        images: [...prevState.images, ...imageObj.hits],
-        isShowBtn: this.state.page * 12 < imageObj.totalHits,
-      }));
+      setImages(prev => [...prev, ...imageObj.hits]);
+      setIsShowBtn(() => page * 12 < imageObj.totalHits);
     } catch (error) {
-      this.setState({ error: error.message });
+      setError(error.message);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  render() {
-    const { images, isLoading, isEmpty, error, isShowBtn } = this.state;
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleSubmit} />
-        {isLoading && <Spinner />}
-        {isEmpty && <Warning>Sorry! there are no images...😒</Warning>}
-        {error && <Warning>{error} 😡</Warning>}
-        <ImageGallery imageItem={images} />
-        {isShowBtn && <Button loadMore={this.handleLoadingMore} />}
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Searchbar onSubmit={handleSubmit} />
+      {isLoading && <Spinner />}
+      {isEmpty && <Warning>Sorry! there are no images...😒</Warning>}
+      {error && <Warning>{error} 😡</Warning>}
+      <ImageGallery imageItem={images} />
+      {isShowBtn && <Button loadMore={handleLoadingMore} />}
+    </div>
+  );
+};
+
