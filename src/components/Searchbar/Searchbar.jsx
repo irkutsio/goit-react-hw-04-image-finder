@@ -9,7 +9,7 @@ const [searchField, setSearchField] = useState('');
 
   const handleChange = e => {
    const {value} = e.target
-      setSearchField(value.trim())
+      setSearchField(value)
   };
 
  const handleSubmit = e => {
