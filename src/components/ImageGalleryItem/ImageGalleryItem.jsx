@@ -18,8 +18,10 @@ export const ImageGalleryItem = ({ previeImg, largeImageURL }) => {
   };
 
   return (
-    <Item onClick={openModal}>
-      <img src={previeImg} alt="img" />
+    <>
+      <Item onClick={openModal}>
+        <img src={previeImg} alt="img" />
+      </Item>
       {isModalOpen && (
         <ModalComponent
           isOpen={isModalOpen}
@@ -27,11 +29,11 @@ export const ImageGalleryItem = ({ previeImg, largeImageURL }) => {
           closeModal={closeModal}
         />
       )}
-    </Item>
+    </>
   );
 };
 
 ImageGalleryItem.propTypes = {
   previeImg: PropTypes.string.isRequired,
   largeImageURL: PropTypes.string.isRequired,
-}
+};
